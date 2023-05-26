@@ -46,7 +46,7 @@ a_request_model = api.schema_model('a_request_model', request_schema)
 @ns.route("/api/<int:first>/<int:second>", methods=['GET'])
 class SumApi(Resource):
     def get(self, first, second):
-        return (first+second, 200)
+        return ({'result' : first+second}, 200)
 
 @ns.route("/api/test", methods=['POST', 'GET'])
 class BodyApi(Resource):
@@ -62,11 +62,24 @@ class BodyApi(Resource):
         res : list(models.Test) = db.session.query(models.Test).all()
         return (list(map(lambda o: o.serialize(), res)), 200)
 
-@ns.route("/api/test/<int:id>", methods=['GET'])
+@ns.route("/api/test/<int:id>", methods=['GET', 'PUT', 'DELETE'])
 class FindOne(Resource):
     def get(self, id):
         ret = db.session.query(models.Test).filter(models.Test.id == id).first()
         return (ret.serialize(), 200)
+    
+    @api.expect(a_request_model, validate=True)
+    def put(self, id):
+        row = db.session.query(models.Test).filter(models.Test.id == id).first()
+        row.a = request.get_json()['a']
+        db.session.commit()
+        return ("success", 200)
+    
+    def delete(self, id):
+        row = db.session.query(models.Test).filter(models.Test.id == id).first()
+        db.session.delete(row)
+        db.session.commit()
+        return ("success", 200)
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)
