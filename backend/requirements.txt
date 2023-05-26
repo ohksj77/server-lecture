@@ -1,0 +1,16 @@
+Flask
+virtualenv
+Werkzeug
+pymysql
+cryptography
+flask-sqlalchemy
+flask-restx
+flask_script
+python-dotenv
+gunicorn
+Flask-Session
+flask
+flask-cors
+sqlalchemy_utils
+sqlalchemy
+requests
